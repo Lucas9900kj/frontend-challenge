@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+backup-antes-kurio.zip
+kurio-projeto.zip
