@@ -214,3 +214,42 @@ Desenvolvido para o desafio técnico Frontend da Jungle Gaming.
 | Detalhes | Desktop | 99 | 95 | 96 | 100 |
 
 Limitacao conhecida: a performance mobile da pagina de detalhes ficou abaixo da meta de 90.
+
+## Testes E2E
+
+Foram aprovados 38 testes Playwright, executados em desktop e mobile.
+
+Para executar os testes:
+
+    cd app
+    npx playwright install chromium
+    npx playwright test
+
+## Infraestrutura
+
+Frontend:
+https://frontend-challenge-roan-alpha.vercel.app
+
+Servidor Socket.IO:
+https://frontend-challenge-jn13.onrender.com
+
+Repositorio:
+https://github.com/Lucas9900kj/frontend-challenge
+
+Variavel de ambiente:
+
+    VITE_SOCKET_URL=https://frontend-challenge-jn13.onrender.com
+
+Para iniciar o servidor Socket.IO localmente:
+
+    npm run socket
+
+## Resultados e limitacoes
+
+- Build de producao aprovado.
+- 13 testes unitarios aprovados.
+- 38 testes Playwright aprovados.
+- Comunicacao com o servidor Socket.IO publicado confirmada.
+- Sincronizacao de estoque entre multiplos usuarios ainda nao validada.
+- Lighthouse mobile da pagina de detalhes: 87 pontos, abaixo da meta de 90.
+
