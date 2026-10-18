@@ -585,7 +585,7 @@ export const handlers = [
 
     const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
 
-    const limit = 2;
+    const limit = 9;
 
     let result = nfts.filter((nft) => {
       const matchesSearch = nft.name.toLowerCase().includes(search);
@@ -855,15 +855,6 @@ export const handlers = [
       status: "CONFIRMED",
       createdAt: new Date().toISOString(),
     };
-
-    for (const item of serverCart) {
-      const nft = nfts.find((current) => current.id === item.nft.id);
-
-      if (nft) {
-        nft.available -= item.quantity;
-        nft.version += 1;
-      }
-    }
 
     orders.set(order.id, order);
 

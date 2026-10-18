@@ -1,46 +1,72 @@
+/* eslint-disable react-refresh/only-export-components */
+import { lazy, Suspense } from "react";
+
 import {
   createRootRoute,
   createRoute,
   createRouter,
   Outlet,
+  Link,
 } from "@tanstack/react-router";
 
-import Home from "./pages/Home";
-import NFTDetails from "./pages/NFTDetails";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Profile from "./pages/Profile";
-import Wallets from "./pages/Wallets";
 import AuthHeader from "./components/AuthHeader";
 
-// Tipo utilizado pelo catálogo e seus filtros
-export interface CatalogSearch {
+// Lazy Loading: cada página é carregada quando necessária.
+const Home = lazy(() => import("./pages/Home"));
+const NFTDetails = lazy(() => import("./pages/NFTDetails"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+
+const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Wallets = lazy(() => import("./pages/Wallets"));
+
+// Parâmetros de busca do catálogo.
+export type CatalogSearch = {
   search: string;
   category: string;
   sort: string;
   page: number;
+};
+
+// Exibido enquanto uma página está sendo carregada.
+function PageLoading() {
+  return (
+    <main
+      role="status"
+      className="flex min-h-[70vh] flex-col items-center justify-center bg-slate-950 px-4 text-white"
+    >
+      <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-700 border-t-purple-500" />
+
+      <p className="mt-5 text-sm font-medium text-slate-400">
+        Carregando página...
+      </p>
+    </main>
+  );
 }
 
-// ========================================
-// ROTA PRINCIPAL
-// ========================================
-
-const rootRoute = createRootRoute({
-  component: () => (
+// Layout principal.
+function RootLayout() {
+  return (
     <>
       <AuthHeader />
-      <Outlet />
+
+      <Suspense fallback={<PageLoading />}>
+        <Outlet />
+      </Suspense>
     </>
-  ),
+  );
+}
+
+// Rota principal.
+const rootRoute = createRootRoute({
+  component: RootLayout,
 });
 
-// ========================================
-// HOME / CATÁLOGO
-// ========================================
-
+// Catálogo.
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -63,115 +89,101 @@ const homeRoute = createRoute({
   component: Home,
 });
 
-// ========================================
-// DETALHES DO NFT
-// ========================================
-
-const nftDetailsRoute = createRoute({
+// Detalhes do NFT.
+const nftRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/nft/$nftId",
   component: NFTDetails,
 });
 
-// ========================================
-// CARRINHO
-// ========================================
-
+// Carrinho.
 const cartRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/cart",
   component: Cart,
 });
 
-// ========================================
-// CHECKOUT
-// ========================================
-
+// Checkout.
 const checkoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/checkout",
   component: Checkout,
 });
 
-// ========================================
-// CONFIRMAÇÃO DO PEDIDO
-// ========================================
-
-const orderConfirmationRoute = createRoute({
+// Confirmação do pedido.
+const orderRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/order/$orderId",
   component: OrderConfirmation,
 });
 
-// ========================================
-// LOGIN
-// ========================================
-
+// Login.
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
   component: Login,
 });
 
-// ========================================
-// CADASTRO
-// ========================================
-
+// Cadastro.
 const signupRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/signup",
   component: Signup,
 });
 
-// ========================================
-// PERFIL
-// ========================================
-
+// Perfil.
 const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/profile",
   component: Profile,
 });
 
-// ========================================
-// CARTEIRAS DIGITAIS
-// ========================================
-
+// Carteiras.
 const walletsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/wallets",
   component: Wallets,
 });
 
-// ========================================
-// ÁRVORE DE ROTAS
-// ========================================
-
+// Registro das rotas.
 const routeTree = rootRoute.addChildren([
   homeRoute,
-  nftDetailsRoute,
+  nftRoute,
   cartRoute,
   checkoutRoute,
-  orderConfirmationRoute,
+  orderRoute,
   loginRoute,
   signupRoute,
   profileRoute,
   walletsRoute,
 ]);
 
-// ========================================
-// CONFIGURAÇÃO DO ROUTER
-// ========================================
-
 export const router = createRouter({
   routeTree,
-  defaultPreload: "intent",
+
+  defaultNotFoundComponent: () => (
+    <main className="flex min-h-[70vh] flex-col items-center justify-center bg-slate-950 px-4 text-center text-white">
+      <h1 className="text-5xl font-bold text-purple-400">404</h1>
+
+      <p className="mt-4 text-xl font-semibold">Página não encontrada</p>
+
+      <Link
+        to="/"
+        search={{
+          search: "",
+          category: "all",
+          sort: "default",
+          page: 1,
+        }}
+        className="mt-6 rounded-xl bg-purple-600 px-6 py-3 font-semibold transition hover:bg-purple-500"
+      >
+        Voltar ao catálogo
+      </Link>
+    </main>
+  ),
 });
 
-// ========================================
-// TIPAGEM DO TANSTACK ROUTER
-// ========================================
-
+// Tipagem das rotas do TanStack Router.
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
