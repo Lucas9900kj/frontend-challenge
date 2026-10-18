@@ -223,3 +223,19 @@ Lucas Soares
 
 Desenvolvido para o desafio técnico Frontend da Jungle Gaming.
 
+
+## Hospedagem
+
+Frontend: Vercel.
+Servidor Socket.IO: Render.
+
+Variavel de ambiente do frontend:
+VITE_SOCKET_URL=https://frontend-challenge-jn13.onrender.com
+
+O servidor Socket.IO utiliza a porta fornecida pelo ambiente de hospedagem.
+
+## Observacoes finais
+
+O marketplace utiliza MSW para simular APIs REST.
+A comunicacao com o servidor Socket.IO publico foi verificada.
+A propagacao de atualizacoes de estoque entre diferentes usuarios ainda nao foi validada.

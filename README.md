@@ -189,3 +189,28 @@ Layout original disponibilizado pela Jungle Gaming no Figma.
 Lucas Soares
 
 Desenvolvido para o desafio técnico Frontend da Jungle Gaming.
+
+## Infraestrutura publicada
+
+- Frontend (Vercel): https://frontend-challenge-roan-alpha.vercel.app
+- Socket.IO (Render): https://frontend-challenge-jn13.onrender.com
+- Repositorio: https://github.com/Lucas9900kj/frontend-challenge
+
+## Validacoes realizadas
+
+- Build de producao aprovado.
+- 13 testes unitarios aprovados.
+- 38 testes Playwright aprovados em desktop e mobile.
+- Fluxos de catalogo, detalhes, carrinho e checkout verificados no site publico.
+- Servidor Socket.IO acessivel publicamente.
+
+## Lighthouse - Medianas
+
+| Pagina | Dispositivo | Performance | Acessibilidade | Boas praticas | SEO |
+|---|---|---:|---:|---:|---:|
+| Home | Mobile | 90 | 97 | 96 | 100 |
+| Home | Desktop | 99 | 97 | 96 | 100 |
+| Detalhes | Mobile | 87 | 95 | 96 | 100 |
+| Detalhes | Desktop | 99 | 95 | 96 | 100 |
+
+Limitacao conhecida: a performance mobile da pagina de detalhes ficou abaixo da meta de 90.
