@@ -1,13 +1,22 @@
-import { createServer } from "node:http";
+﻿import { createServer } from "node:http";
 import { Server } from "socket.io";
 
-const PORT = 3001;
+const PORT = Number(process.env.PORT || 3001);
 
-const httpServer = createServer();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://frontend-challenge-roan-alpha.vercel.app",
+];
+
+const httpServer = createServer((_req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("KURIO Socket.IO online");
+});
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
 });
@@ -43,7 +52,6 @@ io.on("connection", (socket) => {
     }
 
     stock.set(data.nftId, data);
-
     io.emit("stock:updated", data);
 
     console.log(`Estoque atualizado: ${data.nftId} -> ${data.available}`);
@@ -54,6 +62,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Socket.IO funcionando em http://localhost:${PORT}`);
+httpServer.listen(PORT, "0.0.0.0", () => {
+  console.log(`KURIO Socket.IO funcionando na porta ${PORT}`);
 });
