@@ -37,6 +37,24 @@ const networks = [
   { name: "Solana", count: 86 },
 ];
 
+const helpTopics = [
+  {
+    title: "Como comprar NFTs",
+    content:
+      "Explore o catálogo, selecione um NFT e clique para visualizar seus detalhes. Adicione o item ao carrinho, confira os valores e avance para o checkout. Neste projeto, a compra é simulada para demonstrar o funcionamento do marketplace.",
+  },
+  {
+    title: "Carteira e segurança",
+    content:
+      "Acesse a área de carteiras para visualizar as opções de conexão simulada. Em uma plataforma real, nunca compartilhe sua frase de recuperação, senha ou chave privada. As carteiras deste projeto são demonstrativas.",
+  },
+  {
+    title: "Política do mercado",
+    content:
+      "O KURIO é um marketplace demonstrativo desenvolvido para um desafio técnico. Os NFTs, preços, pagamentos e transações apresentados são simulados e não representam negociações reais em blockchain.",
+  },
+];
+
 const articles = [
   {
     image: "/nfts/neon.png",
@@ -76,6 +94,9 @@ export default function Home() {
   const [appliedPrice, setAppliedPrice] = useState(12.3);
   const [activeArticle, setActiveArticle] = useState<
     (typeof articles)[number] | null
+  >(null);
+  const [activeHelp, setActiveHelp] = useState<
+    (typeof helpTopics)[number] | null
   >(null);
 
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -812,6 +833,50 @@ export default function Home() {
         </div>
       )}
 
+      {activeHelp && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
+          onClick={() => setActiveHelp(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={activeHelp.title}
+            className="relative w-full max-w-xl rounded-xl border border-[#68452e] bg-[#281812] p-7"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setActiveHelp(null)}
+              aria-label="Fechar ajuda"
+              className="absolute right-4 top-4 cursor-pointer rounded bg-[#120b09] px-3 py-2 text-white"
+            >
+              ✕
+            </button>
+
+            <p className="text-xs font-bold uppercase text-[#d78e4d]">
+              Central de Ajuda
+            </p>
+
+            <h2 className="mt-4 pr-8 text-xl font-bold text-[#f5e9dc]">
+              {activeHelp.title}
+            </h2>
+
+            <p className="mt-5 text-sm leading-7 text-[#cba383]">
+              {activeHelp.content}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setActiveHelp(null)}
+              className="mt-7 cursor-pointer rounded bg-[#d78e4d] px-6 py-3 text-sm font-bold text-[#1b100c]"
+            >
+              Entendi
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* RODAPÉ */}
       <footer className="border-t border-[#3d271b] bg-[#21140f]">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -831,23 +896,35 @@ export default function Home() {
               </div>
             </div>
 
-            <div>
-              <h3 className="text-sm font-bold">Central de ajuda</h3>
-              <div className="mt-4 space-y-3 text-xs text-[#cba383]">
-                <p>Como comprar NFTs</p>
-                <p>Carteira e segurança</p>
-                <p>Política do mercado</p>
-              </div>
+            <div className="mt-4 space-y-3 text-xs text-[#cba383]">
+              {helpTopics.map((topic) => (
+                <button
+                  key={topic.title}
+                  type="button"
+                  onClick={() => setActiveHelp(topic)}
+                  className="block cursor-pointer text-left transition hover:text-[#d78e4d]"
+                >
+                  {topic.title}
+                </button>
+              ))}
             </div>
 
-            <div>
-              <h3 className="text-sm font-bold">Coleções</h3>
-              <div className="mt-4 space-y-3 text-xs text-[#cba383]">
-                <p>Arte digital</p>
-                <p>Fotografia</p>
-                <p>Música</p>
-                <p>Arte 3D</p>
-              </div>
+            <div className="mt-4 space-y-3 text-xs text-[#cba383]">
+              {["Arte digital", "Fotografia", "Música", "Arte 3D"].map(
+                (collection) => (
+                  <button
+                    key={collection}
+                    type="button"
+                    onClick={() => {
+                      updateFilters({ category: "Art", page: 1 });
+                      scrollToCatalog();
+                    }}
+                    className="block cursor-pointer text-left transition hover:text-[#d78e4d]"
+                  >
+                    {collection}
+                  </button>
+                ),
+              )}
             </div>
 
             <div>
