@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
+import axios from "axios";
 import { getNFT } from "../services/nfts";
-import { addToCart, useCart } from "../store/cart";
+import { useCartApi } from "../hooks/useCartApi";
 
 export default function NFTDetails() {
   const { nftId } = useParams({ from: "/nft/$nftId" });
-
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const cart = useCart();
+  const { cartQuery, addMutation } = useCartApi();
 
   const {
     data: nft,
@@ -23,27 +24,41 @@ export default function NFTDetails() {
   });
 
   const quantityInCart =
-    cart.find((item) => item.nft.id === nftId)?.quantity ?? 0;
+    cartQuery.data?.items.find((item) => item.nft.id === nftId)?.quantity ?? 0;
 
   const remaining = nft ? Math.max(0, nft.available - quantityInCart) : 0;
 
-  function handleAddToCart() {
-    if (!nft) return;
+  const cartCount = cartQuery.data?.totalItems ?? 0;
 
-    const success = addToCart(nft, quantity);
+  async function handleAddToCart() {
+    if (!nft || addMutation.isPending) return;
 
-    if (success) {
+    setMessage("");
+    setError("");
+
+    try {
+      await addMutation.mutateAsync({
+        nftId: nft.id,
+        quantity,
+      });
+
       setMessage("NFT adicionado ao carrinho com sucesso!");
       setQuantity(1);
-    } else {
-      setMessage("Quantidade indisponível no estoque.");
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const response = err.response?.data as { message?: string } | undefined;
+
+        setError(response?.message ?? "Erro ao adicionar NFT.");
+      } else {
+        setError("Ocorreu um erro inesperado.");
+      }
     }
   }
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-10 flex items-center justify-between">
+        <header className="mb-10 flex items-center justify-between gap-4">
           <Link
             to="/"
             search={{
@@ -52,7 +67,7 @@ export default function NFTDetails() {
               sort: "default",
               page: 1,
             }}
-            className="text-purple-400 hover:text-purple-300"
+            className="text-purple-400"
           >
             ← Voltar ao catálogo
           </Link>
@@ -61,31 +76,22 @@ export default function NFTDetails() {
             to="/cart"
             className="rounded-xl bg-purple-600 px-5 py-3 font-semibold"
           >
-            Meu carrinho (
-            {cart.reduce((total, item) => total + item.quantity, 0)})
+            Meu carrinho ({cartCount})
           </Link>
         </header>
 
         {isPending && (
-          <div role="status" className="grid gap-10 md:grid-cols-2">
-            <div className="aspect-square animate-pulse rounded-2xl bg-slate-800" />
-            <div className="space-y-5">
-              <div className="h-10 animate-pulse rounded bg-slate-800" />
-              <div className="h-6 w-1/2 animate-pulse rounded bg-slate-800" />
-            </div>
-            <span className="sr-only">Carregando NFT...</span>
+          <div role="status" className="animate-pulse text-slate-400">
+            Carregando NFT...
           </div>
         )}
 
         {isError && (
-          <div role="alert" className="rounded-2xl bg-slate-900 p-8">
-            <h1 className="text-2xl font-bold">
-              Não foi possível carregar este NFT.
-            </h1>
-
+          <div role="alert" className="rounded-xl bg-slate-900 p-6">
+            <p>Não foi possível carregar este NFT.</p>
             <button
               onClick={() => refetch()}
-              className="mt-5 rounded-xl bg-purple-600 px-5 py-3"
+              className="mt-4 rounded-lg bg-purple-600 px-4 py-2"
             >
               Tentar novamente
             </button>
@@ -101,9 +107,7 @@ export default function NFTDetails() {
             />
 
             <section className="rounded-2xl border border-slate-800 bg-slate-900 p-8">
-              <p className="mb-3 text-sm font-semibold text-purple-400">
-                {nft.category}
-              </p>
+              <p className="mb-3 text-sm text-purple-400">{nft.category}</p>
 
               <h1 className="mb-4 text-4xl font-bold">{nft.name}</h1>
 
@@ -121,6 +125,18 @@ export default function NFTDetails() {
                   {remaining} unidades
                 </span>
               </p>
+
+              {cartQuery.isPending && (
+                <p className="mb-4 text-sm text-slate-400">
+                  Consultando carrinho...
+                </p>
+              )}
+
+              {cartQuery.isError && (
+                <p role="alert" className="mb-4 text-red-400">
+                  Não foi possível consultar o carrinho.
+                </p>
+              )}
 
               <div className="mb-6">
                 <label
@@ -140,8 +156,9 @@ export default function NFTDetails() {
                   onChange={(event) => {
                     setQuantity(Number(event.target.value));
                     setMessage("");
+                    setError("");
                   }}
-                  className="w-28 rounded-xl border border-slate-700 bg-slate-800 p-3 text-white"
+                  className="w-28 rounded-xl border border-slate-700 bg-slate-800 p-3"
                 />
               </div>
 
@@ -149,6 +166,9 @@ export default function NFTDetails() {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={
+                  cartQuery.isPending ||
+                  cartQuery.isError ||
+                  addMutation.isPending ||
                   remaining === 0 ||
                   !Number.isInteger(quantity) ||
                   quantity < 1 ||
@@ -156,15 +176,22 @@ export default function NFTDetails() {
                 }
                 className="w-full rounded-xl bg-purple-600 px-6 py-4 font-bold transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {remaining === 0 ? "Indisponível" : "Adicionar ao carrinho"}
+                {addMutation.isPending
+                  ? "Adicionando..."
+                  : remaining === 0
+                    ? "Indisponível"
+                    : "Adicionar ao carrinho"}
               </button>
 
               {message && (
-                <p
-                  role="status"
-                  className="mt-4 text-center text-sm text-green-400"
-                >
+                <p role="status" className="mt-4 text-green-400">
                   {message}
+                </p>
+              )}
+
+              {error && (
+                <p role="alert" className="mt-4 text-red-400">
+                  {error}
                 </p>
               )}
             </section>
