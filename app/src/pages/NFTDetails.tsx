@@ -140,6 +140,9 @@ export default function NFTDetails() {
                   src={nft.image}
                   alt={nft.name}
                   className="h-full w-full object-cover"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                 />
                 <span className="absolute left-4 top-4 rounded-sm border border-[#755037] bg-[#1a100d]/90 px-3 py-1.5 text-xs font-semibold text-[#e7b282]">
                   {nft.category}

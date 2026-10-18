@@ -18,5 +18,17 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     css: true,
     clearMocks: true,
+
+    // Vitest executa somente os testes unitários.
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+
+    // Playwright executa os testes E2E separadamente.
+    exclude: [
+      "node_modules/**",
+      "dist/**",
+      "e2e/**",
+      "test-results/**",
+      "playwright-report/**",
+    ],
   },
 });

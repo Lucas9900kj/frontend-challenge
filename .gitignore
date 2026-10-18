@@ -1,2 +1,12 @@
 
 /package-lock.json
+
+# Testes e relatórios
+app/playwright-report/
+app/test-results/
+app/lh-*.json
+app/lighthouse-*.json
+lighthouse-*.json
+
+# Backups
+*.bak
