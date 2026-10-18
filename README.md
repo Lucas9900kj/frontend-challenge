@@ -7,7 +7,7 @@ O projeto foi construído com React e TypeScript, inspirado no layout fornecido 
 ## Links
 
 - Repositório: https://github.com/Lucas9900kj/frontend-challenge
-- Aplicação publicada: [adicionar URL após deploy]
+- Aplicação publicada: https://frontend-challenge-roan-alpha.vercel.app
 - Figma: https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1
 
 ## Tecnologias
